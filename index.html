@@ -1,115 +1,831 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Velix</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Velix</title>
+  <style>
+    :root{
+      --bg:#05070b;
+      --card:rgba(14,18,26,.88);
+      --card-2:rgba(18,22,32,.92);
+      --line:rgba(255,255,255,.08);
+      --text:#ffffff;
+      --muted:rgba(255,255,255,.62);
+      --soft:rgba(255,255,255,.08);
+      --accent:#ffffff;
+      --glow:rgba(255,255,255,.06);
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0b0f19;
-  color: #fff;
-}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+    body{min-height:100vh;overflow-x:hidden}
 
-.container {
-  padding: 20px;
-}
+    .stars,
+    .stars:before,
+    .stars:after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+      background-repeat:repeat;
+    }
 
-.card {
-  background: #111827;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
+    .stars{
+      background-image:
+        radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,.35), transparent 60%),
+        radial-gradient(1.5px 1.5px at 140px 80px, rgba(255,255,255,.22), transparent 60%),
+        radial-gradient(1.8px 1.8px at 220px 180px, rgba(255,255,255,.18), transparent 60%),
+        radial-gradient(1.4px 1.4px at 320px 40px, rgba(255,255,255,.20), transparent 60%),
+        radial-gradient(2px 2px at 420px 140px, rgba(255,255,255,.14), transparent 60%);
+      opacity:.22;
+      background-size:460px 260px;
+    }
 
-.title {
-  font-size: 22px;
-  margin-bottom: 10px;
-}
+    .stars:before{
+      background-image:
+        radial-gradient(1.5px 1.5px at 60px 100px, rgba(255,255,255,.18), transparent 60%),
+        radial-gradient(2px 2px at 180px 40px, rgba(255,255,255,.12), transparent 60%),
+        radial-gradient(1.4px 1.4px at 280px 120px, rgba(255,255,255,.16), transparent 60%),
+        radial-gradient(1.6px 1.6px at 360px 200px, rgba(255,255,255,.12), transparent 60%);
+      opacity:.14;
+      background-size:420px 240px;
+    }
 
-.sub {
-  color: #9ca3af;
-  font-size: 14px;
-}
+    .stars:after{
+      background:
+        radial-gradient(circle at 50% 10%, rgba(255,255,255,.05), transparent 35%),
+        linear-gradient(180deg, rgba(255,255,255,.02), transparent 35%);
+      opacity:.9;
+    }
 
-.big {
-  font-size: 32px;
-  margin: 10px 0;
-}
+    .app{
+      position:relative;
+      z-index:1;
+      max-width:430px;
+      margin:0 auto;
+      min-height:100vh;
+      padding:18px 16px 110px;
+    }
 
-.btn {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: none;
-  margin-top: 15px;
-  font-size: 16px;
-  background: #2563eb;
-  color: white;
-}
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:22px;
+    }
 
-.key {
-  background: #020617;
-  padding: 12px;
-  border-radius: 10px;
-  margin-top: 10px;
-  font-size: 14px;
-  word-break: break-all;
-}
-</style>
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .logo{
+      width:46px;
+      height:46px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 10px 30px rgba(0,0,0,.35), inset 0 0 25px rgba(255,255,255,.03);
+      font-weight:700;
+      letter-spacing:1px;
+    }
+
+    .brand-text .name{
+      font-size:24px;
+      font-weight:700;
+      line-height:1.1;
+    }
+
+    .brand-text .sub{
+      font-size:14px;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .chip{
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      color:var(--muted);
+      font-size:13px;
+      background:rgba(255,255,255,.03);
+      backdrop-filter: blur(8px);
+    }
+
+    .hello{
+      margin-bottom:18px;
+    }
+
+    .hello h1{
+      margin:0;
+      font-size:20px;
+      font-weight:700;
+    }
+
+    .hello p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .card{
+      background:linear-gradient(180deg, rgba(20,24,34,.9), rgba(10,13,19,.92));
+      border:1px solid var(--line);
+      border-radius:28px;
+      padding:20px;
+      box-shadow:0 15px 40px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.03);
+      backdrop-filter: blur(10px);
+    }
+
+    .hero{
+      padding:24px 20px 20px;
+      margin-bottom:16px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero:before{
+      content:"";
+      position:absolute;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:radial-gradient(circle, rgba(255,255,255,.08), transparent 65%);
+      top:-70px;
+      left:50%;
+      transform:translateX(-50%);
+      filter:blur(4px);
+    }
+
+    .hero-icon{
+      width:72px;
+      height:72px;
+      margin:0 auto 18px;
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:26px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow:0 0 40px rgba(255,255,255,.04);
+    }
+
+    .hero-title{
+      text-align:center;
+      font-size:24px;
+      font-weight:800;
+      line-height:1.15;
+      margin-bottom:8px;
+    }
+
+    .hero-sub{
+      text-align:center;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.4;
+      max-width:300px;
+      margin:0 auto 18px;
+    }
+
+    .metrics{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      margin:18px 0 8px;
+    }
+
+    .metric{
+      flex:1;
+      text-align:center;
+    }
+
+    .metric .num{
+      font-size:34px;
+      font-weight:800;
+      line-height:1;
+      margin-bottom:6px;
+    }
+
+    .metric .lab{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .btn{
+      width:100%;
+      border:none;
+      border-radius:18px;
+      padding:16px 18px;
+      font-size:17px;
+      font-weight:700;
+      color:#05070b;
+      background:#fff;
+      cursor:pointer;
+      margin-top:16px;
+    }
+
+    .btn.secondary{
+      background:rgba(255,255,255,.06);
+      color:#fff;
+      border:1px solid var(--line);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+      margin-bottom:16px;
+    }
+
+    .mini-card{
+      background:linear-gradient(180deg, rgba(18,22,32,.88), rgba(10,13,19,.92));
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:18px;
+      min-height:140px;
+      box-shadow:0 10px 30px rgba(0,0,0,.22);
+    }
+
+    .mini-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:18px;
+    }
+
+    .mini-value{
+      font-size:28px;
+      font-weight:800;
+      line-height:1.05;
+      margin-bottom:8px;
+    }
+
+    .mini-sub{
+      color:#b9c1cd;
+      font-size:14px;
+    }
+
+    .section{
+      display:none;
+      animation:fade .18s ease;
+    }
+
+    .section.active{
+      display:block;
+    }
+
+    @keyframes fade{
+      from{opacity:.6; transform:translateY(4px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    .list-card{
+      margin-bottom:14px;
+    }
+
+    .section-title{
+      font-size:22px;
+      font-weight:800;
+      margin:2px 0 14px;
+    }
+
+    .row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .tariff{
+      padding:18px;
+      border-radius:22px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.03);
+      margin-bottom:12px;
+    }
+
+    .tariff-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+
+    .tariff-name{
+      font-size:18px;
+      font-weight:700;
+    }
+
+    .tariff-sub{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .price{
+      font-size:24px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      color:#fff;
+      background:rgba(255,255,255,.04);
+      font-size:12px;
+      margin-bottom:10px;
+    }
+
+    .key-box{
+      margin-top:14px;
+      background:#05070b;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size:14px;
+      line-height:1.45;
+      word-break:break-all;
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    .support-box{
+      line-height:1.5;
+      color:#dbe2ea;
+      font-size:15px;
+    }
+
+    .nav{
+      position:fixed;
+      left:50%;
+      transform:translateX(-50%);
+      bottom:14px;
+      width:calc(100% - 24px);
+      max-width:406px;
+      z-index:5;
+      background:rgba(10,13,19,.92);
+      border:1px solid var(--line);
+      border-radius:24px;
+      padding:10px 8px;
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:6px;
+      backdrop-filter: blur(14px);
+      box-shadow:0 10px 35px rgba(0,0,0,.38);
+    }
+
+    .nav-btn{
+      border:none;
+      background:transparent;
+      color:var(--muted);
+      border-radius:18px;
+      padding:10px 4px 8px;
+      font-size:12px;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+    }
+
+    .nav-btn.active{
+      color:#fff;
+      background:rgba(255,255,255,.06);
+    }
+
+    .nav-ico{
+      font-size:19px;
+      line-height:1;
+    }
+
+    .top-gap{
+      margin-top:8px;
+    }
+
+    .small{
+      font-size:13px;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="stars"></div>
 
-<div class="container">
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">V</div>
+        <div class="brand-text">
+          <div class="name">Velix</div>
+          <div class="sub">Личный кабинет</div>
+        </div>
+      </div>
+      <div class="chip">RU</div>
+    </div>
 
-  <div class="card">
-    <div class="title">Velix VPN</div>
-    <div class="sub">Ваш доступ</div>
+    <div id="home" class="section active">
+      <div class="hello">
+        <h1 id="helloName">Добро пожаловать!</h1>
+        <p>Ваша подписка и доступы</p>
+      </div>
 
-    <div id="status">Нет активной подписки</div>
+      <div class="card hero">
+        <div class="hero-icon">✦</div>
+        <div class="hero-title" id="heroTitle">Бесплатный пробный период</div>
+        <div class="hero-sub" id="heroSub">Попробуйте наш VPN бесплатно — без обязательств</div>
 
-    <button class="btn" onclick="activateTrial()">Активировать 48 часов</button>
+        <div class="metrics">
+          <div class="metric">
+            <div class="num" id="leftTimeMain">48</div>
+            <div class="lab" id="leftTimeLabel">часов</div>
+          </div>
+          <div class="metric">
+            <div class="num">∞</div>
+            <div class="lab">ГБ</div>
+          </div>
+          <div class="metric">
+            <div class="num">3</div>
+            <div class="lab">устройств</div>
+          </div>
+        </div>
+
+        <button class="btn" id="mainActionBtn" onclick="mainAction()">Активировать бесплатно</button>
+        <button class="btn secondary" id="copyKeyBtn" onclick="copyKey()" style="display:none;">Скопировать код доступа</button>
+
+        <div class="key-box" id="keyBox" style="display:none;"></div>
+      </div>
+
+      <div class="grid">
+        <div class="mini-card">
+          <div class="mini-top">
+            <span>Баланс</span>
+            <span>›</span>
+          </div>
+          <div class="mini-value" id="balanceValue">0.00 ₽</div>
+          <div class="mini-sub">Для оплаты тарифа</div>
+        </div>
+
+        <div class="mini-card">
+          <div class="mini-top">
+            <span>Рефералы</span>
+            <span>›</span>
+          </div>
+          <div class="mini-value" id="refCount">0</div>
+          <div class="mini-sub">+0.00 ₽</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tariffs" class="section">
+      <div class="section-title">Тарифы</div>
+
+      <div class="tariff">
+        <div class="row">
+          <div class="tariff-left">
+            <div class="tariff-name">1 месяц</div>
+            <div class="tariff-sub">Стартовый доступ</div>
+          </div>
+          <div class="price">299 ₽</div>
+        </div>
+        <button class="btn top-gap" onclick="buyTariff(1,299)">Купить</button>
+      </div>
+
+      <div class="tariff">
+        <div class="badge">Выгоднее</div>
+        <div class="row">
+          <div class="tariff-left">
+            <div class="tariff-name">3 месяца</div>
+            <div class="tariff-sub">Экономия на продлении</div>
+          </div>
+          <div class="price">699 ₽</div>
+        </div>
+        <button class="btn top-gap" onclick="buyTariff(3,699)">Купить</button>
+      </div>
+
+      <div class="tariff">
+        <div class="row">
+          <div class="tariff-left">
+            <div class="tariff-name">6 месяцев</div>
+            <div class="tariff-sub">Оптимальный вариант</div>
+          </div>
+          <div class="price">1199 ₽</div>
+        </div>
+        <button class="btn top-gap" onclick="buyTariff(6,1199)">Купить</button>
+      </div>
+
+      <div class="tariff">
+        <div class="badge">Максимально выгодно</div>
+        <div class="row">
+          <div class="tariff-left">
+            <div class="tariff-name">12 месяцев</div>
+            <div class="tariff-sub">Минимальная цена за месяц</div>
+          </div>
+          <div class="price">1999 ₽</div>
+        </div>
+        <button class="btn top-gap" onclick="buyTariff(12,1999)">Купить</button>
+      </div>
+    </div>
+
+    <div id="balance" class="section">
+      <div class="section-title">Баланс</div>
+
+      <div class="card list-card">
+        <div class="mini-top">
+          <span>Доступно</span>
+          <span>₽</span>
+        </div>
+        <div class="mini-value" id="balancePageValue">0.00 ₽</div>
+        <div class="mini-sub">Пополняйте баланс для оплаты тарифа</div>
+
+        <button class="btn" onclick="topUp(300)">Пополнить на 300 ₽</button>
+        <button class="btn secondary" onclick="topUp(700)">Пополнить на 700 ₽</button>
+        <button class="btn secondary" onclick="topUp(1200)">Пополнить на 1200 ₽</button>
+      </div>
+    </div>
+
+    <div id="referrals" class="section">
+      <div class="section-title">Рефералы</div>
+
+      <div class="card list-card">
+        <div class="mini-top">
+          <span>Ваш код</span>
+          <span>∞</span>
+        </div>
+        <div class="key-box" id="refCodeBox"></div>
+        <button class="btn" onclick="copyRef()">Скопировать ссылку</button>
+        <p class="muted small">Приглашайте друзей и получайте бонусы на баланс.</p>
+      </div>
+
+      <div class="card">
+        <div class="mini-top">
+          <span>Статистика</span>
+          <span>₽</span>
+        </div>
+        <div class="mini-value" id="refPageCount">0</div>
+        <div class="mini-sub">Всего приглашённых</div>
+      </div>
+    </div>
+
+    <div id="support" class="section">
+      <div class="section-title">Поддержка</div>
+
+      <div class="card">
+        <div class="support-box">
+          Если возникли вопросы по доступу, оплате или подключению, напишите в поддержку.
+        </div>
+        <button class="btn" onclick="contactSupport()">Написать в поддержку</button>
+        <button class="btn secondary" onclick="showKeyInSupport()">Показать код доступа</button>
+      </div>
+    </div>
   </div>
 
-  <div class="card" id="keyBlock" style="display:none;">
-    <div class="title">Ваш VPN ключ</div>
-    <div class="key" id="key"></div>
+  <div class="nav">
+    <button class="nav-btn active" onclick="showSection('home', this)">
+      <span class="nav-ico">⌂</span>
+      <span>Главная</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('tariffs', this)">
+      <span class="nav-ico">✦</span>
+      <span>Подписка</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('balance', this)">
+      <span class="nav-ico">▣</span>
+      <span>Баланс</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('referrals', this)">
+      <span class="nav-ico">◌</span>
+      <span>Рефералы</span>
+    </button>
+    <button class="nav-btn" onclick="showSection('support', this)">
+      <span class="nav-ico">⋯</span>
+      <span>Поддержка</span>
+    </button>
   </div>
 
-</div>
+  <script>
+    const KEY_STATE = 'velix_state_v1';
 
-<script>
+    function getDefaultState() {
+      return {
+        userName: 'Badri',
+        balance: 0,
+        refs: 0,
+        refBonus: 0,
+        accessCode: '',
+        trialActive: false,
+        paidActive: false,
+        paidMonths: 0,
+        expiryAt: null,
+        refCode: 'https://t.me/velixfastbot?startapp=ref_' + randomString(8)
+      };
+    }
 
-function generateKey() {
-  return 'VLX-' + Math.random().toString(36).substring(2, 12).toUpperCase();
-}
+    function loadState() {
+      const raw = localStorage.getItem(KEY_STATE);
+      if (!raw) return getDefaultState();
+      try {
+        return { ...getDefaultState(), ...JSON.parse(raw) };
+      } catch {
+        return getDefaultState();
+      }
+    }
 
-function activateTrial() {
-  const key = generateKey();
+    function saveState() {
+      localStorage.setItem(KEY_STATE, JSON.stringify(state));
+    }
 
-  localStorage.setItem('velix_key', key);
-  localStorage.setItem('velix_active', '1');
+    function randomString(len = 10) {
+      return Math.random().toString(36).substring(2, 2 + len).toUpperCase();
+    }
 
-  updateUI();
-}
+    function generateAccessCode() {
+      return 'VLX-' + randomString(6) + '-' + randomString(6);
+    }
 
-function updateUI() {
-  const active = localStorage.getItem('velix_active');
-  const key = localStorage.getItem('velix_key');
+    let state = loadState();
 
-  if (active) {
-    document.getElementById('status').innerText = 'Подписка активна (пробный период)';
-    document.getElementById('keyBlock').style.display = 'block';
-    document.getElementById('key').innerText = key;
-  }
-}
+    function showSection(id, btn) {
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
 
-updateUI();
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+    }
 
-</script>
+    function formatBalance(value) {
+      return Number(value).toFixed(2) + ' ₽';
+    }
 
+    function getTimeLeft() {
+      if (!state.expiryAt) return null;
+      const diff = state.expiryAt - Date.now();
+      if (diff <= 0) return { expired: true };
+      const hours = Math.floor(diff / 1000 / 60 / 60);
+      const days = Math.floor(hours / 24);
+      return { diff, hours, days };
+    }
+
+    function updateStatusCard() {
+      const title = document.getElementById('heroTitle');
+      const sub = document.getElementById('heroSub');
+      const timeMain = document.getElementById('leftTimeMain');
+      const timeLabel = document.getElementById('leftTimeLabel');
+      const btn = document.getElementById('mainActionBtn');
+      const keyBox = document.getElementById('keyBox');
+      const copyBtn = document.getElementById('copyKeyBtn');
+
+      const time = getTimeLeft();
+
+      if ((state.trialActive || state.paidActive) && time && !time.expired) {
+        if (state.paidActive) {
+          title.textContent = 'Подписка активна';
+          sub.textContent = 'Ваш доступ подключён и готов к использованию';
+          btn.textContent = 'Перейти к тарифам';
+          btn.onclick = () => showSection('tariffs', document.querySelectorAll('.nav-btn')[1]);
+        } else {
+          title.textContent = 'Бесплатный пробный период';
+          sub.textContent = 'Ваш пробный доступ активен';
+          btn.textContent = 'Пробный доступ активирован';
+          btn.onclick = () => {};
+        }
+
+        if (time.hours < 24) {
+          timeMain.textContent = time.hours;
+          timeLabel.textContent = pluralHours(time.hours);
+        } else {
+          timeMain.textContent = time.days;
+          timeLabel.textContent = pluralDays(time.days);
+        }
+
+        if (state.accessCode) {
+          keyBox.style.display = 'block';
+          copyBtn.style.display = 'block';
+          keyBox.textContent = state.accessCode;
+        }
+      } else {
+        state.trialActive = false;
+        state.paidActive = false;
+        saveState();
+
+        title.textContent = 'Бесплатный пробный период';
+        sub.textContent = 'Попробуйте наш VPN бесплатно — без обязательств';
+        timeMain.textContent = '48';
+        timeLabel.textContent = 'часов';
+        btn.textContent = 'Активировать бесплатно';
+        btn.onclick = mainAction;
+        keyBox.style.display = 'none';
+        copyBtn.style.display = 'none';
+      }
+    }
+
+    function pluralHours(n) {
+      const mod10 = n % 10, mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return 'час';
+      if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'часа';
+      return 'часов';
+    }
+
+    function pluralDays(n) {
+      const mod10 = n % 10, mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return 'день';
+      if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'дня';
+      return 'дней';
+    }
+
+    function mainAction() {
+      if (state.trialActive || state.paidActive) return;
+      state.trialActive = true;
+      state.paidActive = false;
+      state.accessCode = generateAccessCode();
+      state.expiryAt = Date.now() + 48 * 60 * 60 * 1000;
+      saveState();
+      render();
+      alert('Пробный период активирован');
+    }
+
+    function buyTariff(months, price) {
+      if (state.balance < price) {
+        alert('Недостаточно средств на балансе');
+        showSection('balance', document.querySelectorAll('.nav-btn')[2]);
+        document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-btn')[2].classList.add('active');
+        return;
+      }
+
+      state.balance -= price;
+      state.paidActive = true;
+      state.trialActive = false;
+      state.paidMonths = months;
+      state.accessCode = generateAccessCode();
+      state.expiryAt = Date.now() + months * 30 * 24 * 60 * 60 * 1000;
+
+      saveState();
+      render();
+      alert('Тариф успешно активирован');
+      showSection('home', document.querySelectorAll('.nav-btn')[0]);
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn')[0].classList.add('active');
+    }
+
+    function topUp(amount) {
+      state.balance += amount;
+      saveState();
+      render();
+      alert('Баланс пополнен на ' + amount + ' ₽');
+    }
+
+    function copyKey() {
+      if (!state.accessCode) {
+        alert('Код доступа ещё не создан');
+        return;
+      }
+      navigator.clipboard.writeText(state.accessCode);
+      alert('Код доступа скопирован');
+    }
+
+    function copyRef() {
+      navigator.clipboard.writeText(state.refCode);
+      alert('Реферальная ссылка скопирована');
+    }
+
+    function contactSupport() {
+      window.open('https://t.me/velixfastbot', '_blank');
+    }
+
+    function showKeyInSupport() {
+      if (!state.accessCode) {
+        alert('Активного кода пока нет');
+        return;
+      }
+      alert('Ваш код доступа: ' + state.accessCode);
+    }
+
+    function render() {
+      document.getElementById('helloName').textContent = 'Добро пожаловать, ' + state.userName + '!';
+      document.getElementById('balanceValue').textContent = formatBalance(state.balance);
+      document.getElementById('balancePageValue').textContent = formatBalance(state.balance);
+      document.getElementById('refCount').textContent = state.refs;
+      document.getElementById('refPageCount').textContent = state.refs;
+      document.getElementById('refCodeBox').textContent = state.refCode;
+      updateStatusCard();
+    }
+
+    render();
+    setInterval(render, 60000);
+  </script>
 </body>
 </html>
