@@ -1,58 +1,115 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velix VPN</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-      background: #0b0f19;
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-    .card {
-      width: 90%;
-      max-width: 420px;
-      background: #111827;
-      border-radius: 20px;
-      padding: 24px;
-      box-sizing: border-box;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    }
-    h1 {
-      margin: 0 0 10px;
-      font-size: 28px;
-    }
-    p {
-      margin: 8px 0;
-      color: #cbd5e1;
-      line-height: 1.4;
-    }
-    .btn {
-      margin-top: 20px;
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 14px;
-      font-size: 16px;
-      background: #2563eb;
-      color: white;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velix</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0b0f19;
+  color: #fff;
+}
+
+.container {
+  padding: 20px;
+}
+
+.card {
+  background: #111827;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.sub {
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+.big {
+  font-size: 32px;
+  margin: 10px 0;
+}
+
+.btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  margin-top: 15px;
+  font-size: 16px;
+  background: #2563eb;
+  color: white;
+}
+
+.key {
+  background: #020617;
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 14px;
+  word-break: break-all;
+}
+</style>
 </head>
+
 <body>
+
+<div class="container">
+
   <div class="card">
-    <h1>Velix VPN</h1>
-    <p>Тестовый экран Mini App</p>
-    <p>Пробный период: 48 часов</p>
-    <p>Тарифы от 299 ₽</p>
-    <button class="btn">Открыть доступ</button>
+    <div class="title">Velix VPN</div>
+    <div class="sub">Ваш доступ</div>
+
+    <div id="status">Нет активной подписки</div>
+
+    <button class="btn" onclick="activateTrial()">Активировать 48 часов</button>
   </div>
+
+  <div class="card" id="keyBlock" style="display:none;">
+    <div class="title">Ваш VPN ключ</div>
+    <div class="key" id="key"></div>
+  </div>
+
+</div>
+
+<script>
+
+function generateKey() {
+  return 'VLX-' + Math.random().toString(36).substring(2, 12).toUpperCase();
+}
+
+function activateTrial() {
+  const key = generateKey();
+
+  localStorage.setItem('velix_key', key);
+  localStorage.setItem('velix_active', '1');
+
+  updateUI();
+}
+
+function updateUI() {
+  const active = localStorage.getItem('velix_active');
+  const key = localStorage.getItem('velix_key');
+
+  if (active) {
+    document.getElementById('status').innerText = 'Подписка активна (пробный период)';
+    document.getElementById('keyBlock').style.display = 'block';
+    document.getElementById('key').innerText = key;
+  }
+}
+
+updateUI();
+
+</script>
+
 </body>
 </html>
