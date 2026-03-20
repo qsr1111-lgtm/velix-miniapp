@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Velix</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root{
       --bg:#030507;
@@ -475,6 +476,38 @@
       font-size:18px;
       line-height:1;
     }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:110px;
+      transform:translateX(-50%) translateY(20px);
+      width:calc(100% - 32px);
+      max-width:390px;
+      background:rgba(10,13,19,.96);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:20px;
+      padding:16px 18px;
+      z-index:9999;
+      box-shadow:0 20px 50px rgba(0,0,0,.45);
+      opacity:0;
+      pointer-events:none;
+      transition:.22s ease;
+      backdrop-filter:blur(12px);
+    }
+
+    .toast-title{
+      font-size:14px;
+      color:rgba(255,255,255,.55);
+      margin-bottom:6px;
+    }
+
+    .toast-text{
+      font-size:16px;
+      line-height:1.4;
+      font-weight:600;
+    }
   </style>
 </head>
 <body>
@@ -498,7 +531,7 @@
 
     <div id="home" class="section active">
       <div class="hello">
-        <h1 class="hello-title" id="helloName">Добро пожаловать, Badri!</h1>
+        <h1 class="hello-title" id="helloName">Добро пожаловать!</h1>
         <p class="hello-sub">Ваша подписка</p>
       </div>
 
@@ -543,7 +576,7 @@
             <div class="mini-ico">◎</div>
           </div>
           <div class="mini-value" id="refCount">0</div>
-          <div class="mini-sub">+0.00 ₽ бонусов</div>
+          <div class="mini-sub" id="refBonusText">+0.00 ₽ бонусов</div>
         </div>
       </div>
     </div>
@@ -676,8 +709,13 @@
     </button>
   </div>
 
+  <div id="velixToast" class="toast">
+    <div class="toast-title">Velix</div>
+    <div id="velixToastText" class="toast-text"></div>
+  </div>
+
   <script>
-    const KEY_STATE = 'velix_state_v2';
+    const KEY_STATE = 'velix_state_v3';
 
     function randomString(len = 10) {
       return Math.random().toString(36).substring(2, 2 + len).toUpperCase();
@@ -687,9 +725,25 @@
       return 'VLX-' + randomString(6) + '-' + randomString(6);
     }
 
+    function showToast(text) {
+      const toast = document.getElementById('velixToast');
+      const toastText = document.getElementById('velixToastText');
+      toastText.textContent = text;
+      toast.style.opacity = '1';
+      toast.style.pointerEvents = 'auto';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+
+      clearTimeout(window.velixToastTimer);
+      window.velixToastTimer = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.pointerEvents = 'none';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+      }, 2200);
+    }
+
     function defaultState() {
       return {
-        userName: 'Badri',
+        userName: 'Пользователь',
         balance: 0,
         refs: 0,
         refBonus: 0,
@@ -716,6 +770,29 @@
 
     function saveState() {
       localStorage.setItem(KEY_STATE, JSON.stringify(state));
+    }
+
+    function applyTelegramUser() {
+      if (window.Telegram && window.Telegram.WebApp) {
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        if (tg.setHeaderColor) {
+          try { tg.setHeaderColor('#030507'); } catch(e) {}
+        }
+
+        if (tg.setBackgroundColor) {
+          try { tg.setBackgroundColor('#030507'); } catch(e) {}
+        }
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+          const user = tg.initDataUnsafe.user;
+          if (user.first_name) {
+            state.userName = user.first_name;
+            saveState();
+          }
+        }
+      }
     }
 
     function formatBalance(v) {
@@ -750,6 +827,11 @@
       document.getElementById(id).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       if (btn) btn.classList.add('active');
+    }
+
+    function activateTab(index, id) {
+      const btns = document.querySelectorAll('.nav-btn');
+      showSection(id, btns[index]);
     }
 
     function updateHero() {
@@ -805,11 +887,6 @@
       }
     }
 
-    function activateTab(index, id) {
-      const btns = document.querySelectorAll('.nav-btn');
-      showSection(id, btns[index]);
-    }
-
     function mainAction() {
       if (state.trialActive || state.paidActive) return;
       state.trialActive = true;
@@ -818,15 +895,16 @@
       state.expiryAt = Date.now() + 48 * 60 * 60 * 1000;
       saveState();
       render();
-      alert('Пробный период активирован');
+      showToast('Пробный период активирован');
     }
 
     function buyTariff(months, price) {
       if (state.balance < price) {
-        alert('Недостаточно средств на балансе');
+        showToast('Недостаточно средств на балансе');
         activateTab(2, 'balance');
         return;
       }
+
       state.balance -= price;
       state.trialActive = false;
       state.paidActive = true;
@@ -835,7 +913,7 @@
       state.expiryAt = Date.now() + months * 30 * 24 * 60 * 60 * 1000;
       saveState();
       render();
-      alert('Тариф успешно активирован');
+      showToast('Тариф успешно активирован');
       activateTab(0, 'home');
     }
 
@@ -843,21 +921,21 @@
       state.balance += amount;
       saveState();
       render();
-      alert('Баланс пополнен на ' + amount + ' ₽');
+      showToast('Баланс пополнен на ' + amount + ' ₽');
     }
 
     function copyKey() {
       if (!state.accessCode) {
-        alert('Код доступа ещё не создан');
+        showToast('Код доступа ещё не создан');
         return;
       }
       navigator.clipboard.writeText(state.accessCode);
-      alert('Код доступа скопирован');
+      showToast('Код доступа скопирован');
     }
 
     function copyRef() {
       navigator.clipboard.writeText(state.refCode);
-      alert('Реферальная ссылка скопирована');
+      showToast('Реферальная ссылка скопирована');
     }
 
     function contactSupport() {
@@ -866,10 +944,10 @@
 
     function showKeyInSupport() {
       if (!state.accessCode) {
-        alert('Активного кода пока нет');
+        showToast('Активного кода пока нет');
         return;
       }
-      alert('Ваш код доступа: ' + state.accessCode);
+      showToast('Код доступа: ' + state.accessCode);
     }
 
     function render() {
@@ -878,10 +956,12 @@
       document.getElementById('balancePageValue').textContent = formatBalance(state.balance);
       document.getElementById('refCount').textContent = state.refs;
       document.getElementById('refPageCount').textContent = state.refs;
+      document.getElementById('refBonusText').textContent = '+' + formatBalance(state.refBonus) + ' бонусов';
       document.getElementById('refCodeBox').textContent = state.refCode;
       updateHero();
     }
 
+    applyTelegramUser();
     render();
     setInterval(render, 60000);
   </script>
