@@ -16,8 +16,6 @@
       --text:#ffffff;
       --muted:rgba(255,255,255,.62);
       --muted2:rgba(255,255,255,.42);
-      --glow:rgba(255,255,255,.04);
-      --soft:rgba(255,255,255,.03);
       --ok:#4ade80;
       --warn:#fbbf24;
     }
@@ -26,9 +24,7 @@
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
     body{min-height:100vh;overflow-x:hidden}
 
-    .sky,
-    .sky::before,
-    .sky::after{
+    .sky,.sky::before,.sky::after{
       content:"";
       position:fixed;
       inset:0;
@@ -82,6 +78,7 @@
       align-items:center;
       justify-content:space-between;
       margin-bottom:22px;
+      gap:10px;
     }
 
     .brand{
@@ -139,7 +136,7 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width:190px;
+      max-width:170px;
     }
 
     .top-actions{
@@ -147,6 +144,7 @@
       gap:8px;
       align-items:center;
       flex-shrink:0;
+      position:relative;
     }
 
     .icon-btn, .lang{
@@ -163,14 +161,63 @@
 
     .icon-btn{
       width:42px;
-      font-size:18px;
+      font-size:20px;
+      cursor:pointer;
     }
 
     .lang{
-      padding:0 14px;
+      min-width:70px;
+      padding:0 12px;
       font-size:14px;
-      color:var(--muted);
+      color:var(--text);
       gap:8px;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .lang span{
+      opacity:.5;
+      transition:.15s ease;
+    }
+
+    .lang .active{
+      opacity:1;
+      font-weight:700;
+    }
+
+    .menu{
+      position:absolute;
+      top:50px;
+      right:0;
+      width:220px;
+      border-radius:18px;
+      border:1px solid var(--line);
+      background:rgba(10,13,19,.98);
+      backdrop-filter:blur(16px);
+      box-shadow:0 20px 50px rgba(0,0,0,.45);
+      padding:8px;
+      display:none;
+      z-index:40;
+    }
+
+    .menu.open{display:block}
+
+    .menu-item{
+      width:100%;
+      border:none;
+      background:transparent;
+      color:#fff;
+      text-align:left;
+      padding:12px 12px;
+      border-radius:12px;
+      font-size:14px;
+      cursor:pointer;
+    }
+
+    .menu-item:active,
+    .menu-item:hover{
+      background:rgba(255,255,255,.05);
     }
 
     .hello{
@@ -217,37 +264,6 @@
         inset 0 1px 0 rgba(255,255,255,.03);
       padding:24px 20px 20px;
       margin-bottom:16px;
-    }
-
-    .hero::before{
-      content:"";
-      position:absolute;
-      width:200px;
-      height:200px;
-      left:50%;
-      top:-92px;
-      transform:translateX(-50%);
-      background:radial-gradient(circle, rgba(255,255,255,.055), transparent 62%);
-      filter:blur(8px);
-      pointer-events:none;
-    }
-
-    .hero-icon{
-      width:70px;
-      height:70px;
-      margin:0 auto 16px;
-      border-radius:24px;
-      border:1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015)),
-        radial-gradient(circle at 50% 35%, rgba(255,255,255,.05), transparent 45%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:28px;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.03),
-        0 0 35px rgba(255,255,255,.025);
     }
 
     .hero-title{
@@ -580,6 +596,63 @@
       line-height:1.4;
       font-weight:600;
     }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      z-index:90;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      background:rgba(0,0,0,.5);
+      backdrop-filter:blur(4px);
+    }
+
+    .modal.open{display:flex}
+
+    .modal-sheet{
+      width:min(430px, 100%);
+      max-height:85vh;
+      background:rgba(10,13,19,.98);
+      border:1px solid var(--line);
+      border-bottom:none;
+      border-top-left-radius:28px;
+      border-top-right-radius:28px;
+      padding:18px 16px 28px;
+      box-shadow:0 -20px 60px rgba(0,0,0,.45);
+      overflow:auto;
+    }
+
+    .modal-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .modal-title{
+      font-size:20px;
+      font-weight:800;
+    }
+
+    .close-btn{
+      width:38px;
+      height:38px;
+      border:none;
+      border-radius:12px;
+      background:rgba(255,255,255,.05);
+      color:#fff;
+      font-size:18px;
+      cursor:pointer;
+    }
+
+    .modal-content{
+      color:#d9e0e8;
+      font-size:14px;
+      line-height:1.6;
+      white-space:pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -592,25 +665,34 @@
           <div class="logo-fallback">V</div>
         </div>
         <div class="brand-meta">
-          <div class="title">Личный кабинет</div>
+          <div class="title" id="topCabinetTitle">Личный кабинет</div>
           <div class="sub" id="topUserName">Пользователь</div>
         </div>
       </div>
 
       <div class="top-actions">
-        <div class="icon-btn">⌁</div>
-        <div class="lang">RU</div>
+        <button class="icon-btn" onclick="toggleMenu()">…</button>
+
+        <div class="lang" onclick="toggleLang()">
+          <span id="langRu" class="active">RU</span>
+          <span>/</span>
+          <span id="langEn">EN</span>
+        </div>
+
+        <div class="menu" id="topMenu">
+          <button class="menu-item" onclick="openOffer()">Оферта</button>
+          <button class="menu-item" onclick="openAbout()">О сервисе</button>
+        </div>
       </div>
     </div>
 
     <div id="home" class="section active">
       <div class="hello">
         <h1 class="hello-title" id="helloName">Добро пожаловать!</h1>
-        <p class="hello-sub">Ваша подписка</p>
+        <p class="hello-sub" id="helloSub">Ваша подписка</p>
       </div>
 
       <div class="hero">
-        <div class="hero-icon">✦</div>
         <h2 class="hero-title" id="heroTitle">Бесплатный пробный период</h2>
         <div class="hero-sub" id="heroSub">Попробуйте наш VPN бесплатно — без обязательств</div>
 
@@ -621,11 +703,11 @@
           </div>
           <div class="metric">
             <div class="num">∞</div>
-            <div class="lab">ГБ</div>
+            <div class="lab" id="metricGbLabel">ГБ</div>
           </div>
           <div class="metric">
             <div class="num">3</div>
-            <div class="lab">устройств</div>
+            <div class="lab" id="metricDevicesLabel">устройств</div>
           </div>
         </div>
 
@@ -638,16 +720,16 @@
       <div class="grid">
         <div class="mini">
           <div class="mini-top">
-            <span>Баланс</span>
+            <span id="balanceTitle">Баланс</span>
             <div class="mini-ico">▣</div>
           </div>
           <div class="mini-value" id="balanceValue">0.00 ₽</div>
-          <div class="mini-sub">Средства для оплаты тарифа</div>
+          <div class="mini-sub" id="balanceSub">Средства для оплаты тарифа</div>
         </div>
 
         <div class="mini">
           <div class="mini-top">
-            <span>Рефералы</span>
+            <span id="refsTitle">Рефералы</span>
             <div class="mini-ico">◎</div>
           </div>
           <div class="mini-value" id="refCount">0</div>
@@ -656,145 +738,145 @@
       </div>
 
       <div class="panel">
-        <div class="section-title" style="font-size:20px; margin-top:0;">Статус серверов</div>
+        <div class="section-title" id="serversTitle" style="font-size:20px; margin-top:0;">Статус серверов</div>
         <div class="server-list">
           <div class="server-row">
             <div class="server-left">
               <div class="server-flag">🇳🇱</div>
               <div>
-                <div class="server-name">Нидерланды</div>
-                <div class="server-sub">Рекомендуемый сервер</div>
+                <div class="server-name" id="srvNlName">Нидерланды</div>
+                <div class="server-sub" id="srvNlSub">Рекомендуемый сервер</div>
               </div>
             </div>
-            <div class="server-status ok">● Онлайн</div>
+            <div class="server-status ok" id="srvNlStatus">● Онлайн</div>
           </div>
 
           <div class="server-row">
             <div class="server-left">
               <div class="server-flag">🇩🇪</div>
               <div>
-                <div class="server-name">Германия</div>
-                <div class="server-sub">Стабильное соединение</div>
+                <div class="server-name" id="srvDeName">Германия</div>
+                <div class="server-sub" id="srvDeSub">Стабильное соединение</div>
               </div>
             </div>
-            <div class="server-status ok">● Онлайн</div>
+            <div class="server-status ok" id="srvDeStatus">● Онлайн</div>
           </div>
 
           <div class="server-row">
             <div class="server-left">
               <div class="server-flag">🇺🇸</div>
               <div>
-                <div class="server-name">США</div>
-                <div class="server-sub">Повышенная нагрузка</div>
+                <div class="server-name" id="srvUsName">США</div>
+                <div class="server-sub" id="srvUsSub">Повышенная нагрузка</div>
               </div>
             </div>
-            <div class="server-status warn">● Нагрузка</div>
+            <div class="server-status warn" id="srvUsStatus">● Нагрузка</div>
           </div>
         </div>
       </div>
     </div>
 
     <div id="tariffs" class="section">
-      <div class="section-title">Подписка</div>
+      <div class="section-title" id="tariffsPageTitle">Подписка</div>
 
       <div class="panel">
         <div class="tariff">
           <div class="row">
             <div>
-              <div class="tariff-name">1 месяц</div>
-              <div class="tariff-sub">Быстрый старт без переплаты</div>
+              <div class="tariff-name" id="t1name">1 месяц</div>
+              <div class="tariff-sub" id="t1sub">Быстрый старт без переплаты</div>
             </div>
             <div class="price">299 ₽</div>
           </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(1,299)">Купить</button>
+          <button class="btn primary" style="margin-top:14px" id="buy1" onclick="buyTariff(1,299)">Купить</button>
         </div>
 
         <div class="tariff">
-          <div class="badge">Выгодно</div>
+          <div class="badge" id="badgeWin">Выгодно</div>
           <div class="row">
             <div>
-              <div class="tariff-name">3 месяца</div>
-              <div class="tariff-sub">Ниже цена за месяц</div>
+              <div class="tariff-name" id="t3name">3 месяца</div>
+              <div class="tariff-sub" id="t3sub">Ниже цена за месяц</div>
             </div>
             <div class="price">699 ₽</div>
           </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(3,699)">Купить</button>
+          <button class="btn primary" style="margin-top:14px" id="buy3" onclick="buyTariff(3,699)">Купить</button>
         </div>
 
         <div class="tariff">
           <div class="row">
             <div>
-              <div class="tariff-name">6 месяцев</div>
-              <div class="tariff-sub">Оптимальный вариант</div>
+              <div class="tariff-name" id="t6name">6 месяцев</div>
+              <div class="tariff-sub" id="t6sub">Оптимальный вариант</div>
             </div>
             <div class="price">1199 ₽</div>
           </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(6,1199)">Купить</button>
+          <button class="btn primary" style="margin-top:14px" id="buy6" onclick="buyTariff(6,1199)">Купить</button>
         </div>
 
         <div class="tariff" style="margin-bottom:0">
-          <div class="badge">Максимальная выгода</div>
+          <div class="badge" id="badgeMax">Максимальная выгода</div>
           <div class="row">
             <div>
-              <div class="tariff-name">12 месяцев</div>
-              <div class="tariff-sub">Минимальная цена за месяц</div>
+              <div class="tariff-name" id="t12name">12 месяцев</div>
+              <div class="tariff-sub" id="t12sub">Минимальная цена за месяц</div>
             </div>
             <div class="price">1999 ₽</div>
           </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(12,1999)">Купить</button>
+          <button class="btn primary" style="margin-top:14px" id="buy12" onclick="buyTariff(12,1999)">Купить</button>
         </div>
       </div>
     </div>
 
     <div id="balance" class="section">
-      <div class="section-title">Баланс</div>
+      <div class="section-title" id="balancePageTitle">Баланс</div>
 
       <div class="panel">
         <div class="mini-top">
-          <span>Доступно</span>
+          <span id="availableTitle">Доступно</span>
           <div class="mini-ico">₽</div>
         </div>
         <div class="mini-value" id="balancePageValue">0.00 ₽</div>
-        <div class="mini-sub" style="margin-bottom:16px">Пополните баланс для оплаты подписки</div>
+        <div class="mini-sub" style="margin-bottom:16px" id="balancePageSub">Пополните баланс для оплаты подписки</div>
 
-        <button class="btn primary" onclick="topUp(300)">Пополнить на 300 ₽</button>
-        <button class="btn secondary" onclick="topUp(700)">Пополнить на 700 ₽</button>
-        <button class="btn secondary" onclick="topUp(1200)">Пополнить на 1200 ₽</button>
+        <button class="btn primary" id="topup300" onclick="topUp(300)">Пополнить на 300 ₽</button>
+        <button class="btn secondary" id="topup700" onclick="topUp(700)">Пополнить на 700 ₽</button>
+        <button class="btn secondary" id="topup1200" onclick="topUp(1200)">Пополнить на 1200 ₽</button>
       </div>
     </div>
 
     <div id="referrals" class="section">
-      <div class="section-title">Рефералы</div>
+      <div class="section-title" id="refsPageTitle">Рефералы</div>
 
       <div class="panel">
         <div class="mini-top">
-          <span>Ваша ссылка</span>
+          <span id="yourLinkTitle">Ваша ссылка</span>
           <div class="mini-ico">∞</div>
         </div>
         <div class="key-box" id="refCodeBox"></div>
-        <button class="btn primary" style="margin-top:14px" onclick="copyRef()">Скопировать ссылку</button>
-        <div class="muted small" style="margin-top:12px">Приглашайте друзей и получайте бонусы на баланс.</div>
+        <button class="btn primary" style="margin-top:14px" id="copyRefBtn" onclick="copyRef()">Скопировать ссылку</button>
+        <div class="muted small" style="margin-top:12px" id="refsHint">Приглашайте друзей и получайте бонусы на баланс.</div>
       </div>
 
       <div class="panel">
         <div class="mini-top">
-          <span>Статистика</span>
+          <span id="statsTitle">Статистика</span>
           <div class="mini-ico">◎</div>
         </div>
         <div class="mini-value" id="refPageCount">0</div>
-        <div class="mini-sub">Всего приглашённых пользователей</div>
+        <div class="mini-sub" id="refsTotalSub">Всего приглашённых пользователей</div>
       </div>
     </div>
 
     <div id="support" class="section">
-      <div class="section-title">Поддержка</div>
+      <div class="section-title" id="supportPageTitle">Поддержка</div>
 
       <div class="panel">
-        <div class="mini-sub" style="color:#dde4ed; font-size:15px; line-height:1.5; margin-bottom:16px">
+        <div class="mini-sub" style="color:#dde4ed; font-size:15px; line-height:1.5; margin-bottom:16px" id="supportText">
           Если возникли вопросы по доступу, оплате или подключению, напишите в поддержку.
         </div>
-        <button class="btn primary" onclick="contactSupport()">Написать в поддержку</button>
-        <button class="btn secondary" onclick="showKeyInSupport()">Показать код доступа</button>
+        <button class="btn primary" id="supportBtn" onclick="contactSupport()">Написать в поддержку</button>
+        <button class="btn secondary" id="supportKeyBtn" onclick="showKeyInSupport()">Показать код доступа</button>
       </div>
     </div>
   </div>
@@ -802,23 +884,23 @@
   <div class="nav">
     <button class="nav-btn active" onclick="showSection('home', this)">
       <span class="nav-ico">⌂</span>
-      <span>Главная</span>
+      <span id="navHome">Главная</span>
     </button>
     <button class="nav-btn" onclick="showSection('tariffs', this)">
       <span class="nav-ico">✦</span>
-      <span>Подписка</span>
+      <span id="navTariffs">Подписка</span>
     </button>
     <button class="nav-btn" onclick="showSection('balance', this)">
       <span class="nav-ico">▣</span>
-      <span>Баланс</span>
+      <span id="navBalance">Баланс</span>
     </button>
     <button class="nav-btn" onclick="showSection('referrals', this)">
       <span class="nav-ico">◎</span>
-      <span>Рефералы</span>
+      <span id="navRefs">Рефералы</span>
     </button>
     <button class="nav-btn" onclick="showSection('support', this)">
       <span class="nav-ico">⋯</span>
-      <span>Поддержка</span>
+      <span id="navSupport">Поддержка</span>
     </button>
   </div>
 
@@ -827,8 +909,229 @@
     <div id="velixToastText" class="toast-text"></div>
   </div>
 
+  <div id="infoModal" class="modal" onclick="closeModal(event)">
+    <div class="modal-sheet" onclick="event.stopPropagation()">
+      <div class="modal-head">
+        <div class="modal-title" id="modalTitle">Оферта</div>
+        <button class="close-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-content" id="modalContent"></div>
+    </div>
+  </div>
+
   <script>
-    const KEY_STATE = 'velix_state_v4';
+    const KEY_STATE = 'velix_state_v5';
+
+    const OFFER_RU = `ПУБЛИЧНАЯ ОФЕРТА
+
+Ниже сейчас стоит шаблонный блок для замены.
+Я не нашёл в доступных файлах твою готовую оферту, поэтому сюда нужно вставить точный юридический текст из твоих документов.
+
+Что сюда вставить:
+1. Полное наименование исполнителя
+2. Контакты
+3. Предмет оферты
+4. Порядок оплаты
+5. Условия доступа к сервису
+6. Ограничение ответственности
+7. Возвраты и порядок рассмотрения обращений
+8. Реквизиты
+
+После того как пришлёшь текст оферты, я встрою его в этот блок без шаблона.`;
+
+    const OFFER_EN = `PUBLIC OFFER
+
+A placeholder is currently used here.
+I could not find your final legal offer text in the available files for this chat.
+
+Please replace this block with your exact legal text:
+1. Legal entity / seller details
+2. Contacts
+3. Subject of the offer
+4. Payment terms
+5. Service access conditions
+6. Liability limitations
+7. Refund policy
+8. Company details`;
+
+    const ABOUT_RU = `Velix — это сервис для быстрого и удобного доступа через защищённое подключение.
+
+Что доступно пользователю:
+— пробный период
+— тарифы на 1, 3, 6 и 12 месяцев
+— до 3 устройств
+— внутренняя система баланса
+— реферальная программа
+— поддержка через Telegram
+
+Текущая версия интерфейса — демонстрационно-коммерческая упаковка сервиса.`;
+
+    const ABOUT_EN = `Velix is a service for fast and convenient access through a secure connection.
+
+User features:
+— free trial period
+— 1, 3, 6 and 12 month plans
+— up to 3 devices
+— internal balance system
+— referral program
+— Telegram support
+
+The current version of the interface is a commercial demo packaging of the service.`;
+
+    const I18N = {
+      ru: {
+        cabinet: 'Личный кабинет',
+        welcome: 'Добро пожаловать, {name}!',
+        sub: 'Ваша подписка',
+        trialTitle: 'Бесплатный пробный период',
+        trialSub: 'Попробуйте наш VPN бесплатно — без обязательств',
+        activeTitle: 'Подписка активна',
+        activeSub: 'Ваш доступ подключён и готов к использованию',
+        trialBtn: 'Активировать бесплатно',
+        trialActiveBtn: 'Пробный доступ активирован',
+        chooseTariffBtn: 'Выбрать другой тариф',
+        copyCode: 'Скопировать код доступа',
+        showCode: 'Показать код доступа',
+        hours: 'часов',
+        gb: 'ГБ',
+        devices: 'устройств',
+        balance: 'Баланс',
+        balanceSub: 'Средства для оплаты тарифа',
+        refs: 'Рефералы',
+        refsBonus: '+{sum} бонусов',
+        servers: 'Статус серверов',
+        nlName: 'Нидерланды',
+        nlSub: 'Рекомендуемый сервер',
+        deName: 'Германия',
+        deSub: 'Стабильное соединение',
+        usName: 'США',
+        usSub: 'Повышенная нагрузка',
+        online: '● Онлайн',
+        load: '● Нагрузка',
+        tariffs: 'Подписка',
+        buy: 'Купить',
+        t1name: '1 месяц',
+        t1sub: 'Быстрый старт без переплаты',
+        t3name: '3 месяца',
+        t3sub: 'Ниже цена за месяц',
+        t6name: '6 месяцев',
+        t6sub: 'Оптимальный вариант',
+        t12name: '12 месяцев',
+        t12sub: 'Минимальная цена за месяц',
+        badgeWin: 'Выгодно',
+        badgeMax: 'Максимальная выгода',
+        available: 'Доступно',
+        balancePageSub: 'Пополните баланс для оплаты подписки',
+        topup300: 'Пополнить на 300 ₽',
+        topup700: 'Пополнить на 700 ₽',
+        topup1200: 'Пополнить на 1200 ₽',
+        yourLink: 'Ваша ссылка',
+        copyLink: 'Скопировать ссылку',
+        refsHint: 'Приглашайте друзей и получайте бонусы на баланс.',
+        stats: 'Статистика',
+        refsTotalSub: 'Всего приглашённых пользователей',
+        support: 'Поддержка',
+        supportText: 'Если возникли вопросы по доступу, оплате или подключению, напишите в поддержку.',
+        supportBtn: 'Написать в поддержку',
+        supportKeyBtn: 'Показать код доступа',
+        navHome: 'Главная',
+        navTariffs: 'Подписка',
+        navBalance: 'Баланс',
+        navRefs: 'Рефералы',
+        navSupport: 'Поддержка',
+        toastTrial: 'Пробный период активирован',
+        toastNoBalance: 'Недостаточно средств на балансе',
+        toastTariff: 'Тариф успешно активирован',
+        toastTopup: 'Баланс пополнен на {sum} ₽',
+        toastNoCode: 'Код доступа ещё не создан',
+        toastCopyCode: 'Код доступа скопирован',
+        toastCopyRef: 'Реферальная ссылка скопирована',
+        toastNoActiveCode: 'Активного кода пока нет',
+        toastCode: 'Код доступа: {code}',
+        offer: 'Оферта',
+        about: 'О сервисе'
+      },
+      en: {
+        cabinet: 'Personal account',
+        welcome: 'Welcome, {name}!',
+        sub: 'Your subscription',
+        trialTitle: 'Free trial period',
+        trialSub: 'Try our VPN for free — no commitments',
+        activeTitle: 'Subscription active',
+        activeSub: 'Your access is connected and ready to use',
+        trialBtn: 'Activate for free',
+        trialActiveBtn: 'Trial is active',
+        chooseTariffBtn: 'Choose another plan',
+        copyCode: 'Copy access code',
+        showCode: 'Show access code',
+        hours: 'hours',
+        gb: 'GB',
+        devices: 'devices',
+        balance: 'Balance',
+        balanceSub: 'Funds to pay for the plan',
+        refs: 'Referrals',
+        refsBonus: '+{sum} bonus',
+        servers: 'Server status',
+        nlName: 'Netherlands',
+        nlSub: 'Recommended server',
+        deName: 'Germany',
+        deSub: 'Stable connection',
+        usName: 'USA',
+        usSub: 'High load',
+        online: '● Online',
+        load: '● Load',
+        tariffs: 'Subscription',
+        buy: 'Buy',
+        t1name: '1 month',
+        t1sub: 'Fast start without overpaying',
+        t3name: '3 months',
+        t3sub: 'Lower monthly price',
+        t6name: '6 months',
+        t6sub: 'Best choice',
+        t12name: '12 months',
+        t12sub: 'Lowest monthly price',
+        badgeWin: 'Best deal',
+        badgeMax: 'Maximum value',
+        available: 'Available',
+        balancePageSub: 'Top up your balance to pay for subscription',
+        topup300: 'Top up 300 ₽',
+        topup700: 'Top up 700 ₽',
+        topup1200: 'Top up 1200 ₽',
+        yourLink: 'Your link',
+        copyLink: 'Copy link',
+        refsHint: 'Invite friends and get bonuses to your balance.',
+        stats: 'Statistics',
+        refsTotalSub: 'Total invited users',
+        support: 'Support',
+        supportText: 'If you have questions about access, payment or connection, contact support.',
+        supportBtn: 'Contact support',
+        supportKeyBtn: 'Show access code',
+        navHome: 'Home',
+        navTariffs: 'Plans',
+        navBalance: 'Balance',
+        navRefs: 'Referrals',
+        navSupport: 'Support',
+        toastTrial: 'Trial period activated',
+        toastNoBalance: 'Insufficient balance',
+        toastTariff: 'Plan activated successfully',
+        toastTopup: 'Balance topped up by {sum} ₽',
+        toastNoCode: 'Access code has not been created yet',
+        toastCopyCode: 'Access code copied',
+        toastCopyRef: 'Referral link copied',
+        toastNoActiveCode: 'No active code yet',
+        toastCode: 'Access code: {code}',
+        offer: 'Offer',
+        about: 'About service'
+      }
+    };
+
+    function t(key, vars = {}) {
+      let text = (I18N[state.lang] && I18N[state.lang][key]) || key;
+      Object.keys(vars).forEach(k => {
+        text = text.replaceAll(`{${k}}`, vars[k]);
+      });
+      return text;
+    }
 
     function randomString(len = 10) {
       return Math.random().toString(36).substring(2, 2 + len).toUpperCase();
@@ -866,7 +1169,8 @@
         paidMonths: 0,
         expiryAt: null,
         refCode: 'https://t.me/velixfastbot?startapp=ref_' + randomString(8),
-        avatarUrl: ''
+        avatarUrl: '',
+        lang: 'ru'
       };
     }
 
@@ -894,22 +1198,13 @@
         if (tg.setHeaderColor) {
           try { tg.setHeaderColor('#030507'); } catch(e) {}
         }
-
         if (tg.setBackgroundColor) {
           try { tg.setBackgroundColor('#030507'); } catch(e) {}
         }
-
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
           const user = tg.initDataUnsafe.user;
-
-          if (user.first_name) {
-            state.userName = user.first_name;
-          }
-
-          if (user.photo_url) {
-            state.avatarUrl = user.photo_url;
-          }
-
+          if (user.first_name) state.userName = user.first_name;
+          if (user.photo_url) state.avatarUrl = user.photo_url;
           saveState();
         }
       }
@@ -928,14 +1223,14 @@
       return Number(v).toFixed(2) + ' ₽';
     }
 
-    function pluralHours(n) {
+    function pluralHoursRu(n) {
       const mod10 = n % 10, mod100 = n % 100;
       if (mod10 === 1 && mod100 !== 11) return 'час';
       if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'часа';
       return 'часов';
     }
 
-    function pluralDays(n) {
+    function pluralDaysRu(n) {
       const mod10 = n % 10, mod100 = n % 100;
       if (mod10 === 1 && mod100 !== 11) return 'день';
       if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'дня';
@@ -956,6 +1251,7 @@
       document.getElementById(id).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
       if (btn) btn.classList.add('active');
+      closeTopMenu();
     }
 
     function activateTab(index, id) {
@@ -977,23 +1273,23 @@
 
       if ((state.trialActive || state.paidActive) && time && !time.expired) {
         if (state.paidActive) {
-          title.textContent = 'Подписка активна';
-          sub.textContent = 'Ваш доступ подключён и готов к использованию';
-          mainBtn.textContent = 'Выбрать другой тариф';
+          title.textContent = t('activeTitle');
+          sub.textContent = t('activeSub');
+          mainBtn.textContent = t('chooseTariffBtn');
           mainBtn.onclick = () => activateTab(1, 'tariffs');
         } else {
-          title.textContent = 'Бесплатный пробный период';
-          sub.textContent = 'Ваш пробный доступ активен';
-          mainBtn.textContent = 'Пробный доступ активирован';
+          title.textContent = t('trialTitle');
+          sub.textContent = state.lang === 'ru' ? 'Ваш пробный доступ активен' : 'Your trial access is active';
+          mainBtn.textContent = t('trialActiveBtn');
           mainBtn.onclick = () => {};
         }
 
         if (time.hours < 24) {
           timeMain.textContent = time.hours;
-          timeLabel.textContent = pluralHours(time.hours);
+          timeLabel.textContent = state.lang === 'ru' ? pluralHoursRu(time.hours) : 'hours';
         } else {
           timeMain.textContent = time.days;
-          timeLabel.textContent = pluralDays(time.days);
+          timeLabel.textContent = state.lang === 'ru' ? pluralDaysRu(time.days) : 'days';
         }
 
         if (state.accessCode) {
@@ -1007,16 +1303,19 @@
         state.paidActive = false;
         saveState();
 
-        title.textContent = 'Бесплатный пробный период';
-        sub.textContent = 'Попробуйте наш VPN бесплатно — без обязательств';
+        title.textContent = t('trialTitle');
+        sub.textContent = t('trialSub');
         timeMain.textContent = '48';
-        timeLabel.textContent = 'часов';
-        mainBtn.textContent = 'Активировать бесплатно';
+        timeLabel.textContent = t('hours');
+        mainBtn.textContent = t('trialBtn');
         mainBtn.onclick = mainAction;
         keyBox.style.display = 'none';
         copyBtn.style.display = 'none';
         showKeyBtn.style.display = 'none';
       }
+
+      copyBtn.textContent = t('copyCode');
+      showKeyBtn.textContent = t('showCode');
     }
 
     function mainAction() {
@@ -1027,12 +1326,12 @@
       state.expiryAt = Date.now() + 48 * 60 * 60 * 1000;
       saveState();
       render();
-      showToast('Пробный период активирован');
+      showToast(t('toastTrial'));
     }
 
     function buyTariff(months, price) {
       if (state.balance < price) {
-        showToast('Недостаточно средств на балансе');
+        showToast(t('toastNoBalance'));
         activateTab(2, 'balance');
         return;
       }
@@ -1045,7 +1344,7 @@
       state.expiryAt = Date.now() + months * 30 * 24 * 60 * 60 * 1000;
       saveState();
       render();
-      showToast('Тариф успешно активирован');
+      showToast(t('toastTariff'));
       activateTab(0, 'home');
     }
 
@@ -1053,21 +1352,21 @@
       state.balance += amount;
       saveState();
       render();
-      showToast('Баланс пополнен на ' + amount + ' ₽');
+      showToast(t('toastTopup', { sum: amount }));
     }
 
     function copyKey() {
       if (!state.accessCode) {
-        showToast('Код доступа ещё не создан');
+        showToast(t('toastNoCode'));
         return;
       }
       navigator.clipboard.writeText(state.accessCode);
-      showToast('Код доступа скопирован');
+      showToast(t('toastCopyCode'));
     }
 
     function copyRef() {
       navigator.clipboard.writeText(state.refCode);
-      showToast('Реферальная ссылка скопирована');
+      showToast(t('toastCopyRef'));
     }
 
     function contactSupport() {
@@ -1076,24 +1375,151 @@
 
     function showKeyInSupport() {
       if (!state.accessCode) {
-        showToast('Активного кода пока нет');
+        showToast(t('toastNoActiveCode'));
         return;
       }
-      showToast('Код доступа: ' + state.accessCode);
+      showToast(t('toastCode', { code: state.accessCode }));
+    }
+
+    function toggleMenu() {
+      document.getElementById('topMenu').classList.toggle('open');
+    }
+
+    function closeTopMenu() {
+      document.getElementById('topMenu').classList.remove('open');
+    }
+
+    function openOffer() {
+      closeTopMenu();
+      document.getElementById('modalTitle').textContent = t('offer');
+      document.getElementById('modalContent').textContent = state.lang === 'ru' ? OFFER_RU : OFFER_EN;
+      document.getElementById('infoModal').classList.add('open');
+    }
+
+    function openAbout() {
+      closeTopMenu();
+      document.getElementById('modalTitle').textContent = t('about');
+      document.getElementById('modalContent').textContent = state.lang === 'ru' ? ABOUT_RU : ABOUT_EN;
+      document.getElementById('infoModal').classList.add('open');
+    }
+
+    function closeModal(event) {
+      if (!event || event.target.id === 'infoModal') {
+        document.getElementById('infoModal').classList.remove('open');
+      }
+    }
+
+    function toggleLang() {
+      state.lang = state.lang === 'ru' ? 'en' : 'ru';
+      saveState();
+      render();
+    }
+
+    function renderLangSwitch() {
+      document.getElementById('langRu').classList.toggle('active', state.lang === 'ru');
+      document.getElementById('langEn').classList.toggle('active', state.lang === 'en');
+    }
+
+    function renderTexts() {
+      document.getElementById('topCabinetTitle').textContent = t('cabinet');
+      document.getElementById('helloName').textContent = t('welcome', { name: state.userName });
+      document.getElementById('helloSub').textContent = t('sub');
+
+      document.getElementById('metricGbLabel').textContent = t('gb');
+      document.getElementById('metricDevicesLabel').textContent = t('devices');
+
+      document.getElementById('balanceTitle').textContent = t('balance');
+      document.getElementById('balanceSub').textContent = t('balanceSub');
+      document.getElementById('refsTitle').textContent = t('refs');
+
+      document.getElementById('serversTitle').textContent = t('servers');
+      document.getElementById('srvNlName').textContent = t('nlName');
+      document.getElementById('srvNlSub').textContent = t('nlSub');
+      document.getElementById('srvNlStatus').textContent = t('online');
+      document.getElementById('srvDeName').textContent = t('deName');
+      document.getElementById('srvDeSub').textContent = t('deSub');
+      document.getElementById('srvDeStatus').textContent = t('online');
+      document.getElementById('srvUsName').textContent = t('usName');
+      document.getElementById('srvUsSub').textContent = t('usSub');
+      document.getElementById('srvUsStatus').textContent = t('load');
+
+      document.getElementById('tariffsPageTitle').textContent = t('tariffs');
+      document.getElementById('t1name').textContent = t('t1name');
+      document.getElementById('t1sub').textContent = t('t1sub');
+      document.getElementById('t3name').textContent = t('t3name');
+      document.getElementById('t3sub').textContent = t('t3sub');
+      document.getElementById('t6name').textContent = t('t6name');
+      document.getElementById('t6sub').textContent = t('t6sub');
+      document.getElementById('t12name').textContent = t('t12name');
+      document.getElementById('t12sub').textContent = t('t12sub');
+      document.getElementById('badgeWin').textContent = t('badgeWin');
+      document.getElementById('badgeMax').textContent = t('badgeMax');
+      document.getElementById('buy1').textContent = t('buy');
+      document.getElementById('buy3').textContent = t('buy');
+      document.getElementById('buy6').textContent = t('buy');
+      document.getElementById('buy12').textContent = t('buy');
+
+      document.getElementById('balancePageTitle').textContent = t('balance');
+      document.getElementById('availableTitle').textContent = t('available');
+      document.getElementById('balancePageSub').textContent = t('balancePageSub');
+      document.getElementById('topup300').textContent = t('topup300');
+      document.getElementById('topup700').textContent = t('topup700');
+      document.getElementById('topup1200').textContent = t('topup1200');
+
+      document.getElementById('refsPageTitle').textContent = t('refs');
+      document.getElementById('yourLinkTitle').textContent = t('yourLink');
+      document.getElementById('copyRefBtn').textContent = t('copyLink');
+      document.getElementById('refsHint').textContent = t('refsHint');
+      document.getElementById('statsTitle').textContent = t('stats');
+      document.getElementById('refsTotalSub').textContent = t('refsTotalSub');
+
+      document.getElementById('supportPageTitle').textContent = t('support');
+      document.getElementById('supportText').textContent = t('supportText');
+      document.getElementById('supportBtn').textContent = t('supportBtn');
+      document.getElementById('supportKeyBtn').textContent = t('supportKeyBtn');
+
+      document.getElementById('navHome').textContent = t('navHome');
+      document.getElementById('navTariffs').textContent = t('navTariffs');
+      document.getElementById('navBalance').textContent = t('navBalance');
+      document.getElementById('navRefs').textContent = t('navRefs');
+      document.getElementById('navSupport').textContent = t('navSupport');
+
+      const openMenuItems = document.querySelectorAll('.menu-item');
+      if (openMenuItems[0]) openMenuItems[0].textContent = t('offer');
+      if (openMenuItems[1]) openMenuItems[1].textContent = t('about');
+    }
+
+    function renderAvatar() {
+      const box = document.getElementById('userAvatar');
+      if (state.avatarUrl) {
+        box.innerHTML = '<img src="' + state.avatarUrl + '" alt="avatar">';
+      } else {
+        box.innerHTML = '<div class="logo-fallback">V</div>';
+      }
     }
 
     function render() {
       document.getElementById('topUserName').textContent = state.userName;
-      document.getElementById('helloName').textContent = 'Добро пожаловать, ' + state.userName + '!';
       document.getElementById('balanceValue').textContent = formatBalance(state.balance);
       document.getElementById('balancePageValue').textContent = formatBalance(state.balance);
       document.getElementById('refCount').textContent = state.refs;
       document.getElementById('refPageCount').textContent = state.refs;
-      document.getElementById('refBonusText').textContent = '+' + formatBalance(state.refBonus) + ' бонусов';
+      document.getElementById('refBonusText').textContent = t('refsBonus', { sum: formatBalance(state.refBonus) });
       document.getElementById('refCodeBox').textContent = state.refCode;
+
+      renderLangSwitch();
+      renderTexts();
       renderAvatar();
       updateHero();
     }
+
+    document.addEventListener('click', function(e){
+      const menu = document.getElementById('topMenu');
+      const actions = document.querySelector('.top-actions');
+      if (!actions.contains(e.target)) {
+        menu.classList.remove('open');
+      }
+    });
 
     applyTelegramUser();
     render();
