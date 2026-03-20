@@ -1,969 +1,253 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>Velix</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root{
-      --bg:#030507;
-      --panel:#0a0d12;
-      --card:#0d1118;
-      --card2:#0b0f15;
-      --line:rgba(255,255,255,.08);
-      --line2:rgba(255,255,255,.05);
-      --text:#ffffff;
-      --muted:rgba(255,255,255,.62);
-      --muted2:rgba(255,255,255,.42);
-      --glow:rgba(255,255,255,.04);
-      --soft:rgba(255,255,255,.03);
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Velix</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-    body{min-height:100vh;overflow-x:hidden}
+<style>
+:root{
+--bg:#030507;
+--card:#0d1118;
+--line:rgba(255,255,255,.08);
+--text:#fff;
+--muted:rgba(255,255,255,.6);
+}
 
-    .sky,
-    .sky::before,
-    .sky::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      z-index:0;
-    }
+*{box-sizing:border-box}
+body{
+margin:0;
+background:var(--bg);
+color:#fff;
+font-family:-apple-system,Arial;
+}
 
-    .sky{
-      background:
-        radial-gradient(1.7px 1.7px at 8% 15%, rgba(255,255,255,.20), transparent 60%),
-        radial-gradient(1.4px 1.4px at 22% 42%, rgba(255,255,255,.12), transparent 60%),
-        radial-gradient(1.8px 1.8px at 37% 26%, rgba(255,255,255,.15), transparent 60%),
-        radial-gradient(1.5px 1.5px at 49% 12%, rgba(255,255,255,.10), transparent 60%),
-        radial-gradient(1.8px 1.8px at 63% 38%, rgba(255,255,255,.16), transparent 60%),
-        radial-gradient(1.4px 1.4px at 74% 18%, rgba(255,255,255,.10), transparent 60%),
-        radial-gradient(1.8px 1.8px at 88% 30%, rgba(255,255,255,.14), transparent 60%),
-        radial-gradient(1.3px 1.3px at 15% 72%, rgba(255,255,255,.10), transparent 60%),
-        radial-gradient(1.6px 1.6px at 31% 84%, rgba(255,255,255,.12), transparent 60%),
-        radial-gradient(1.5px 1.5px at 55% 76%, rgba(255,255,255,.10), transparent 60%),
-        radial-gradient(1.8px 1.8px at 72% 86%, rgba(255,255,255,.12), transparent 60%),
-        radial-gradient(1.4px 1.4px at 91% 68%, rgba(255,255,255,.10), transparent 60%);
-      opacity:.22;
-    }
+.sky{
+position:fixed;
+inset:0;
+background:
+radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.15),transparent),
+radial-gradient(1px 1px at 70% 60%,rgba(255,255,255,.1),transparent),
+radial-gradient(1px 1px at 40% 80%,rgba(255,255,255,.12),transparent);
+opacity:.25;
+}
 
-    .sky::before{
-      background:
-        radial-gradient(circle at 50% 12%, rgba(255,255,255,.045), transparent 28%),
-        radial-gradient(circle at 84% 60%, rgba(255,255,255,.02), transparent 18%),
-        radial-gradient(circle at 16% 74%, rgba(255,255,255,.018), transparent 16%);
-      filter:blur(10px);
-    }
+.app{padding:16px;max-width:420px;margin:auto;position:relative}
 
-    .sky::after{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.015), transparent 22%),
-        linear-gradient(0deg, rgba(255,255,255,.01), transparent 18%);
-      opacity:.8;
-    }
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
 
-    .app{
-      position:relative;
-      z-index:1;
-      max-width:430px;
-      margin:0 auto;
-      min-height:100vh;
-      padding:16px 16px 112px;
-    }
+.profile{display:flex;gap:10px;align-items:center}
 
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:22px;
-    }
+.avatar{
+width:44px;height:44px;border-radius:14px;
+background:#111;
+border:1px solid var(--line);
+overflow:hidden;
+display:flex;align-items:center;justify-content:center;
+}
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-    }
+.avatar img{width:100%;height:100%;object-fit:cover}
 
-    .logo{
-      width:44px;
-      height:44px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.015)),
-        radial-gradient(circle at 50% 30%, rgba(255,255,255,.06), transparent 50%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.04),
-        0 10px 35px rgba(0,0,0,.35);
-      font-weight:800;
-      font-size:18px;
-      letter-spacing:.5px;
-    }
+.title{font-size:18px;font-weight:700}
+.username{font-size:13px;color:var(--muted)}
 
-    .brand-meta .title{
-      font-size:18px;
-      font-weight:700;
-      line-height:1.1;
-    }
+.card{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:20px;
+padding:20px;
+margin-bottom:16px;
+}
 
-    .brand-meta .sub{
-      margin-top:4px;
-      font-size:13px;
-      color:var(--muted);
-    }
+.big{font-size:28px;font-weight:800}
+.muted{color:var(--muted)}
 
-    .top-actions{
-      display:flex;
-      gap:8px;
-      align-items:center;
-    }
+.btn{
+width:100%;
+padding:14px;
+border-radius:14px;
+border:none;
+margin-top:10px;
+font-weight:700;
+}
 
-    .icon-btn, .lang{
-      height:42px;
-      border-radius:14px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.025);
-      color:var(--text);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
-    }
+.primary{background:#fff;color:#000}
+.secondary{background:#111;color:#fff;border:1px solid var(--line)}
 
-    .icon-btn{
-      width:42px;
-      font-size:18px;
-    }
+.key{
+background:#000;
+padding:12px;
+border-radius:10px;
+margin-top:10px;
+word-break:break-all;
+font-size:13px;
+}
 
-    .lang{
-      padding:0 14px;
-      font-size:14px;
-      color:var(--muted);
-      gap:8px;
-    }
+.server{
+display:flex;
+justify-content:space-between;
+margin-top:10px;
+font-size:14px;
+}
 
-    .hello{
-      margin-bottom:16px;
-    }
+.status-online{color:#00ff9c}
+.status-mid{color:#ffd000}
 
-    .hello-title{
-      font-size:21px;
-      font-weight:800;
-      line-height:1.15;
-      margin:0;
-    }
+.nav{
+position:fixed;
+bottom:10px;
+left:50%;
+transform:translateX(-50%);
+width:calc(100% - 20px);
+max-width:400px;
+display:flex;
+justify-content:space-around;
+background:#05070b;
+border:1px solid var(--line);
+border-radius:20px;
+padding:10px;
+}
 
-    .hello-sub{
-      margin:6px 0 0;
-      color:var(--muted);
-      font-size:15px;
-    }
+.nav button{
+background:none;border:none;color:#999;font-size:12px
+}
 
-    .section{
-      display:none;
-      animation:fade .18s ease;
-    }
+.nav .active{color:#fff}
 
-    .section.active{
-      display:block;
-    }
-
-    @keyframes fade{
-      from{opacity:.65; transform:translateY(4px)}
-      to{opacity:1; transform:translateY(0)}
-    }
-
-    .hero{
-      position:relative;
-      overflow:hidden;
-      border-radius:30px;
-      border:1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(16,20,29,.94), rgba(8,11,16,.96)),
-        radial-gradient(circle at 50% 0%, rgba(255,255,255,.05), transparent 35%);
-      box-shadow:
-        0 20px 50px rgba(0,0,0,.42),
-        inset 0 1px 0 rgba(255,255,255,.03);
-      padding:24px 20px 20px;
-      margin-bottom:16px;
-    }
-
-    .hero::before{
-      content:"";
-      position:absolute;
-      width:200px;
-      height:200px;
-      left:50%;
-      top:-92px;
-      transform:translateX(-50%);
-      background:radial-gradient(circle, rgba(255,255,255,.055), transparent 62%);
-      filter:blur(8px);
-      pointer-events:none;
-    }
-
-    .hero-icon{
-      width:70px;
-      height:70px;
-      margin:0 auto 16px;
-      border-radius:24px;
-      border:1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.015)),
-        radial-gradient(circle at 50% 35%, rgba(255,255,255,.05), transparent 45%);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:28px;
-      box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.03),
-        0 0 35px rgba(255,255,255,.025);
-    }
-
-    .hero-title{
-      text-align:center;
-      font-size:24px;
-      font-weight:800;
-      line-height:1.15;
-      margin:0 0 8px;
-      letter-spacing:-.2px;
-    }
-
-    .hero-sub{
-      text-align:center;
-      max-width:300px;
-      margin:0 auto 18px;
-      color:var(--muted);
-      font-size:15px;
-      line-height:1.4;
-    }
-
-    .metrics{
-      display:flex;
-      gap:10px;
-      justify-content:space-between;
-      margin-bottom:16px;
-    }
-
-    .metric{
-      flex:1;
-      text-align:center;
-    }
-
-    .metric .num{
-      font-size:36px;
-      line-height:1;
-      font-weight:800;
-      margin-bottom:6px;
-      letter-spacing:-.4px;
-    }
-
-    .metric .lab{
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .btn{
-      width:100%;
-      border:none;
-      border-radius:18px;
-      padding:16px 18px;
-      font-size:17px;
-      font-weight:800;
-      cursor:pointer;
-      transition:transform .08s ease, opacity .12s ease;
-    }
-
-    .btn:active{transform:scale(.99)}
-    .btn.primary{
-      background:#fff;
-      color:#05070b;
-      box-shadow:0 10px 30px rgba(255,255,255,.05);
-    }
-
-    .btn.secondary{
-      margin-top:10px;
-      background:rgba(255,255,255,.045);
-      color:#fff;
-      border:1px solid var(--line);
-    }
-
-    .key-box{
-      margin-top:12px;
-      padding:14px;
-      border-radius:18px;
-      border:1px solid var(--line2);
-      background:#06080c;
-      color:#f5f7fa;
-      font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size:14px;
-      line-height:1.45;
-      word-break:break-all;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-      margin-bottom:16px;
-    }
-
-    .mini{
-      min-height:150px;
-      border-radius:26px;
-      border:1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(14,18,26,.94), rgba(9,12,17,.95));
-      box-shadow:
-        0 14px 36px rgba(0,0,0,.28),
-        inset 0 1px 0 rgba(255,255,255,.025);
-      padding:18px;
-    }
-
-    .mini-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      color:var(--muted);
-      font-size:14px;
-      margin-bottom:24px;
-    }
-
-    .mini-ico{
-      width:30px;
-      height:30px;
-      border-radius:10px;
-      border:1px solid var(--line2);
-      background:rgba(255,255,255,.03);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:14px;
-      color:#d8dee7;
-    }
-
-    .mini-value{
-      font-size:30px;
-      font-weight:800;
-      line-height:1.05;
-      letter-spacing:-.3px;
-      margin-bottom:8px;
-    }
-
-    .mini-sub{
-      color:#b9c1cd;
-      font-size:14px;
-      line-height:1.35;
-    }
-
-    .section-title{
-      font-size:24px;
-      font-weight:800;
-      margin:2px 0 14px;
-      letter-spacing:-.25px;
-    }
-
-    .panel{
-      border-radius:28px;
-      border:1px solid var(--line);
-      background:
-        linear-gradient(180deg, rgba(14,18,26,.94), rgba(9,12,17,.95));
-      box-shadow:
-        0 16px 40px rgba(0,0,0,.32),
-        inset 0 1px 0 rgba(255,255,255,.02);
-      padding:18px;
-      margin-bottom:14px;
-    }
-
-    .tariff{
-      border-radius:24px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.022);
-      padding:18px;
-      margin-bottom:12px;
-    }
-
-    .row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-    }
-
-    .tariff-name{
-      font-size:18px;
-      font-weight:700;
-      margin-bottom:6px;
-    }
-
-    .tariff-sub{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.35;
-    }
-
-    .price{
-      font-size:26px;
-      font-weight:800;
-      letter-spacing:-.3px;
-      white-space:nowrap;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.045);
-      font-size:12px;
-      color:#fff;
-      margin-bottom:10px;
-    }
-
-    .muted{color:var(--muted)}
-    .small{font-size:13px}
-
-    .nav{
-      position:fixed;
-      left:50%;
-      transform:translateX(-50%);
-      bottom:14px;
-      width:calc(100% - 24px);
-      max-width:406px;
-      z-index:6;
-      border-radius:26px;
-      border:1px solid var(--line);
-      background:rgba(8,11,16,.94);
-      backdrop-filter:blur(16px);
-      box-shadow:
-        0 16px 40px rgba(0,0,0,.42),
-        inset 0 1px 0 rgba(255,255,255,.02);
-      padding:10px 8px;
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:6px;
-    }
-
-    .nav-btn{
-      border:none;
-      background:transparent;
-      color:var(--muted2);
-      border-radius:18px;
-      padding:10px 4px 8px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:6px;
-      cursor:pointer;
-      font-size:12px;
-      transition:all .12s ease;
-    }
-
-    .nav-btn.active{
-      color:#fff;
-      background:rgba(255,255,255,.055);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
-    }
-
-    .nav-ico{
-      font-size:18px;
-      line-height:1;
-    }
-
-    .toast{
-      position:fixed;
-      left:50%;
-      bottom:110px;
-      transform:translateX(-50%) translateY(20px);
-      width:calc(100% - 32px);
-      max-width:390px;
-      background:rgba(10,13,19,.96);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:20px;
-      padding:16px 18px;
-      z-index:9999;
-      box-shadow:0 20px 50px rgba(0,0,0,.45);
-      opacity:0;
-      pointer-events:none;
-      transition:.22s ease;
-      backdrop-filter:blur(12px);
-    }
-
-    .toast-title{
-      font-size:14px;
-      color:rgba(255,255,255,.55);
-      margin-bottom:6px;
-    }
-
-    .toast-text{
-      font-size:16px;
-      line-height:1.4;
-      font-weight:600;
-    }
-  </style>
+.toast{
+position:fixed;
+bottom:100px;
+left:50%;
+transform:translateX(-50%);
+background:#111;
+padding:14px 18px;
+border-radius:16px;
+border:1px solid var(--line);
+opacity:0;
+transition:.2s;
+}
+</style>
 </head>
+
 <body>
-  <div class="sky"></div>
+<div class="sky"></div>
 
-  <div class="app">
-    <div class="top">
-      <div class="brand">
-        <div class="logo">V</div>
-        <div class="brand-meta">
-          <div class="title">Личный кабинет</div>
-          <div class="sub">Velix</div>
-        </div>
-      </div>
+<div class="app">
 
-      <div class="top-actions">
-        <div class="icon-btn">⌁</div>
-        <div class="lang">RU</div>
-      </div>
-    </div>
+<div class="top">
+<div class="profile">
+<div class="avatar" id="avatar"></div>
+<div>
+<div class="title">Личный кабинет</div>
+<div class="username" id="username">Загрузка...</div>
+</div>
+</div>
+</div>
 
-    <div id="home" class="section active">
-      <div class="hello">
-        <h1 class="hello-title" id="helloName">Добро пожаловать!</h1>
-        <p class="hello-sub">Ваша подписка</p>
-      </div>
+<div class="card">
+<div class="big" id="statusText">Нет подписки</div>
+<div class="muted" id="timeText">Активируйте пробный доступ</div>
 
-      <div class="hero">
-        <div class="hero-icon">✦</div>
-        <h2 class="hero-title" id="heroTitle">Бесплатный пробный период</h2>
-        <div class="hero-sub" id="heroSub">Попробуйте наш VPN бесплатно — без обязательств</div>
+<button class="btn primary" onclick="activateTrial()">Активировать 48 часов</button>
+<button class="btn secondary" onclick="copyKey()">Скопировать код</button>
 
-        <div class="metrics">
-          <div class="metric">
-            <div class="num" id="leftTimeMain">48</div>
-            <div class="lab" id="leftTimeLabel">часов</div>
-          </div>
-          <div class="metric">
-            <div class="num">∞</div>
-            <div class="lab">ГБ</div>
-          </div>
-          <div class="metric">
-            <div class="num">3</div>
-            <div class="lab">устройств</div>
-          </div>
-        </div>
+<div class="key" id="keyBox" style="display:none"></div>
+</div>
 
-        <button class="btn primary" id="mainActionBtn" onclick="mainAction()">Активировать бесплатно</button>
-        <button class="btn secondary" id="copyKeyBtn" onclick="copyKey()" style="display:none;">Скопировать код доступа</button>
-        <div class="key-box" id="keyBox" style="display:none;"></div>
-      </div>
+<div class="card">
+<div class="big">Серверы</div>
 
-      <div class="grid">
-        <div class="mini">
-          <div class="mini-top">
-            <span>Баланс</span>
-            <div class="mini-ico">▣</div>
-          </div>
-          <div class="mini-value" id="balanceValue">0.00 ₽</div>
-          <div class="mini-sub">Средства для оплаты тарифа</div>
-        </div>
+<div class="server">
+<span>🇳🇱 Нидерланды</span>
+<span class="status-online">● Онлайн</span>
+</div>
 
-        <div class="mini">
-          <div class="mini-top">
-            <span>Рефералы</span>
-            <div class="mini-ico">◎</div>
-          </div>
-          <div class="mini-value" id="refCount">0</div>
-          <div class="mini-sub" id="refBonusText">+0.00 ₽ бонусов</div>
-        </div>
-      </div>
-    </div>
+<div class="server">
+<span>🇩🇪 Германия</span>
+<span class="status-online">● Онлайн</span>
+</div>
 
-    <div id="tariffs" class="section">
-      <div class="section-title">Подписка</div>
+<div class="server">
+<span>🇺🇸 США</span>
+<span class="status-mid">● Нагрузка</span>
+</div>
 
-      <div class="panel">
-        <div class="tariff">
-          <div class="row">
-            <div>
-              <div class="tariff-name">1 месяц</div>
-              <div class="tariff-sub">Быстрый старт без переплаты</div>
-            </div>
-            <div class="price">299 ₽</div>
-          </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(1,299)">Купить</button>
-        </div>
+</div>
 
-        <div class="tariff">
-          <div class="badge">Выгодно</div>
-          <div class="row">
-            <div>
-              <div class="tariff-name">3 месяца</div>
-              <div class="tariff-sub">Ниже цена за месяц</div>
-            </div>
-            <div class="price">699 ₽</div>
-          </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(3,699)">Купить</button>
-        </div>
+</div>
 
-        <div class="tariff">
-          <div class="row">
-            <div>
-              <div class="tariff-name">6 месяцев</div>
-              <div class="tariff-sub">Оптимальный вариант</div>
-            </div>
-            <div class="price">1199 ₽</div>
-          </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(6,1199)">Купить</button>
-        </div>
+<div class="nav">
+<button class="active">Главная</button>
+<button>Подписка</button>
+<button>Баланс</button>
+<button>Реф</button>
+<button>Поддержка</button>
+</div>
 
-        <div class="tariff" style="margin-bottom:0">
-          <div class="badge">Максимальная выгода</div>
-          <div class="row">
-            <div>
-              <div class="tariff-name">12 месяцев</div>
-              <div class="tariff-sub">Минимальная цена за месяц</div>
-            </div>
-            <div class="price">1999 ₽</div>
-          </div>
-          <button class="btn primary" style="margin-top:14px" onclick="buyTariff(12,1999)">Купить</button>
-        </div>
-      </div>
-    </div>
+<div id="toast" class="toast"></div>
 
-    <div id="balance" class="section">
-      <div class="section-title">Баланс</div>
+<script>
+let state = JSON.parse(localStorage.getItem('velix') || '{}');
 
-      <div class="panel">
-        <div class="mini-top">
-          <span>Доступно</span>
-          <div class="mini-ico">₽</div>
-        </div>
-        <div class="mini-value" id="balancePageValue">0.00 ₽</div>
-        <div class="mini-sub" style="margin-bottom:16px">Пополните баланс для оплаты подписки</div>
+function save(){
+localStorage.setItem('velix',JSON.stringify(state));
+}
 
-        <button class="btn primary" onclick="topUp(300)">Пополнить на 300 ₽</button>
-        <button class="btn secondary" onclick="topUp(700)">Пополнить на 700 ₽</button>
-        <button class="btn secondary" onclick="topUp(1200)">Пополнить на 1200 ₽</button>
-      </div>
-    </div>
+function toast(t){
+const el=document.getElementById('toast');
+el.innerText=t;
+el.style.opacity=1;
+setTimeout(()=>el.style.opacity=0,2000);
+}
 
-    <div id="referrals" class="section">
-      <div class="section-title">Рефералы</div>
+function generate(){
+return 'VLX-'+Math.random().toString(36).substring(2,10).toUpperCase();
+}
 
-      <div class="panel">
-        <div class="mini-top">
-          <span>Ваша ссылка</span>
-          <div class="mini-ico">∞</div>
-        </div>
-        <div class="key-box" id="refCodeBox"></div>
-        <button class="btn primary" style="margin-top:14px" onclick="copyRef()">Скопировать ссылку</button>
-        <div class="muted small" style="margin-top:12px">Приглашайте друзей и получайте бонусы на баланс.</div>
-      </div>
+function activateTrial(){
+state.key=generate();
+state.expire=Date.now()+48*3600000;
+save();
+render();
+toast('Пробный доступ активирован');
+}
 
-      <div class="panel">
-        <div class="mini-top">
-          <span>Статистика</span>
-          <div class="mini-ico">◎</div>
-        </div>
-        <div class="mini-value" id="refPageCount">0</div>
-        <div class="mini-sub">Всего приглашённых пользователей</div>
-      </div>
-    </div>
+function copyKey(){
+if(!state.key){toast('Нет кода');return}
+navigator.clipboard.writeText(state.key);
+toast('Код скопирован');
+}
 
-    <div id="support" class="section">
-      <div class="section-title">Поддержка</div>
+function render(){
+if(state.key){
+document.getElementById('keyBox').style.display='block';
+document.getElementById('keyBox').innerText=state.key;
 
-      <div class="panel">
-        <div class="mini-sub" style="color:#dde4ed; font-size:15px; line-height:1.5; margin-bottom:16px">
-          Если возникли вопросы по доступу, оплате или подключению, напишите в поддержку.
-        </div>
-        <button class="btn primary" onclick="contactSupport()">Написать в поддержку</button>
-        <button class="btn secondary" onclick="showKeyInSupport()">Показать код доступа</button>
-      </div>
-    </div>
-  </div>
+let left=Math.floor((state.expire-Date.now())/3600000);
+document.getElementById('statusText').innerText='Подписка активна';
+document.getElementById('timeText').innerText='Осталось '+left+' часов';
+}
+}
 
-  <div class="nav">
-    <button class="nav-btn active" onclick="showSection('home', this)">
-      <span class="nav-ico">⌂</span>
-      <span>Главная</span>
-    </button>
-    <button class="nav-btn" onclick="showSection('tariffs', this)">
-      <span class="nav-ico">✦</span>
-      <span>Подписка</span>
-    </button>
-    <button class="nav-btn" onclick="showSection('balance', this)">
-      <span class="nav-ico">▣</span>
-      <span>Баланс</span>
-    </button>
-    <button class="nav-btn" onclick="showSection('referrals', this)">
-      <span class="nav-ico">◎</span>
-      <span>Рефералы</span>
-    </button>
-    <button class="nav-btn" onclick="showSection('support', this)">
-      <span class="nav-ico">⋯</span>
-      <span>Поддержка</span>
-    </button>
-  </div>
+function loadUser(){
+const tg=window.Telegram.WebApp;
 
-  <div id="velixToast" class="toast">
-    <div class="toast-title">Velix</div>
-    <div id="velixToastText" class="toast-text"></div>
-  </div>
+if(tg.initDataUnsafe?.user){
+let u=tg.initDataUnsafe.user;
 
-  <script>
-    const KEY_STATE = 'velix_state_v3';
+document.getElementById('username').innerText=u.first_name;
 
-    function randomString(len = 10) {
-      return Math.random().toString(36).substring(2, 2 + len).toUpperCase();
-    }
+if(u.photo_url){
+document.getElementById('avatar').innerHTML=
+'<img src="'+u.photo_url+'">'
+}
+}
+}
 
-    function generateAccessCode() {
-      return 'VLX-' + randomString(6) + '-' + randomString(6);
-    }
+loadUser();
+render();
+</script>
 
-    function showToast(text) {
-      const toast = document.getElementById('velixToast');
-      const toastText = document.getElementById('velixToastText');
-      toastText.textContent = text;
-      toast.style.opacity = '1';
-      toast.style.pointerEvents = 'auto';
-      toast.style.transform = 'translateX(-50%) translateY(0)';
-
-      clearTimeout(window.velixToastTimer);
-      window.velixToastTimer = setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.pointerEvents = 'none';
-        toast.style.transform = 'translateX(-50%) translateY(20px)';
-      }, 2200);
-    }
-
-    function defaultState() {
-      return {
-        userName: 'Пользователь',
-        balance: 0,
-        refs: 0,
-        refBonus: 0,
-        accessCode: '',
-        trialActive: false,
-        paidActive: false,
-        paidMonths: 0,
-        expiryAt: null,
-        refCode: 'https://t.me/velixfastbot?startapp=ref_' + randomString(8)
-      };
-    }
-
-    function loadState() {
-      const raw = localStorage.getItem(KEY_STATE);
-      if (!raw) return defaultState();
-      try {
-        return { ...defaultState(), ...JSON.parse(raw) };
-      } catch {
-        return defaultState();
-      }
-    }
-
-    let state = loadState();
-
-    function saveState() {
-      localStorage.setItem(KEY_STATE, JSON.stringify(state));
-    }
-
-    function applyTelegramUser() {
-      if (window.Telegram && window.Telegram.WebApp) {
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
-        if (tg.setHeaderColor) {
-          try { tg.setHeaderColor('#030507'); } catch(e) {}
-        }
-
-        if (tg.setBackgroundColor) {
-          try { tg.setBackgroundColor('#030507'); } catch(e) {}
-        }
-
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-          const user = tg.initDataUnsafe.user;
-          if (user.first_name) {
-            state.userName = user.first_name;
-            saveState();
-          }
-        }
-      }
-    }
-
-    function formatBalance(v) {
-      return Number(v).toFixed(2) + ' ₽';
-    }
-
-    function pluralHours(n) {
-      const mod10 = n % 10, mod100 = n % 100;
-      if (mod10 === 1 && mod100 !== 11) return 'час';
-      if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'часа';
-      return 'часов';
-    }
-
-    function pluralDays(n) {
-      const mod10 = n % 10, mod100 = n % 100;
-      if (mod10 === 1 && mod100 !== 11) return 'день';
-      if (mod10 >= 2 && mod10 <= 4 && !(mod100 >= 12 && mod100 <= 14)) return 'дня';
-      return 'дней';
-    }
-
-    function getTimeLeft() {
-      if (!state.expiryAt) return null;
-      const diff = state.expiryAt - Date.now();
-      if (diff <= 0) return { expired: true };
-      const hours = Math.floor(diff / 1000 / 60 / 60);
-      const days = Math.floor(hours / 24);
-      return { diff, hours, days };
-    }
-
-    function showSection(id, btn) {
-      document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-    }
-
-    function activateTab(index, id) {
-      const btns = document.querySelectorAll('.nav-btn');
-      showSection(id, btns[index]);
-    }
-
-    function updateHero() {
-      const title = document.getElementById('heroTitle');
-      const sub = document.getElementById('heroSub');
-      const timeMain = document.getElementById('leftTimeMain');
-      const timeLabel = document.getElementById('leftTimeLabel');
-      const mainBtn = document.getElementById('mainActionBtn');
-      const copyBtn = document.getElementById('copyKeyBtn');
-      const keyBox = document.getElementById('keyBox');
-
-      const time = getTimeLeft();
-
-      if ((state.trialActive || state.paidActive) && time && !time.expired) {
-        if (state.paidActive) {
-          title.textContent = 'Подписка активна';
-          sub.textContent = 'Ваш доступ подключён и готов к использованию';
-          mainBtn.textContent = 'Выбрать другой тариф';
-          mainBtn.onclick = () => activateTab(1, 'tariffs');
-        } else {
-          title.textContent = 'Бесплатный пробный период';
-          sub.textContent = 'Ваш пробный доступ активен';
-          mainBtn.textContent = 'Пробный доступ активирован';
-          mainBtn.onclick = () => {};
-        }
-
-        if (time.hours < 24) {
-          timeMain.textContent = time.hours;
-          timeLabel.textContent = pluralHours(time.hours);
-        } else {
-          timeMain.textContent = time.days;
-          timeLabel.textContent = pluralDays(time.days);
-        }
-
-        if (state.accessCode) {
-          keyBox.style.display = 'block';
-          copyBtn.style.display = 'block';
-          keyBox.textContent = state.accessCode;
-        }
-      } else {
-        state.trialActive = false;
-        state.paidActive = false;
-        saveState();
-
-        title.textContent = 'Бесплатный пробный период';
-        sub.textContent = 'Попробуйте наш VPN бесплатно — без обязательств';
-        timeMain.textContent = '48';
-        timeLabel.textContent = 'часов';
-        mainBtn.textContent = 'Активировать бесплатно';
-        mainBtn.onclick = mainAction;
-        keyBox.style.display = 'none';
-        copyBtn.style.display = 'none';
-      }
-    }
-
-    function mainAction() {
-      if (state.trialActive || state.paidActive) return;
-      state.trialActive = true;
-      state.paidActive = false;
-      state.accessCode = generateAccessCode();
-      state.expiryAt = Date.now() + 48 * 60 * 60 * 1000;
-      saveState();
-      render();
-      showToast('Пробный период активирован');
-    }
-
-    function buyTariff(months, price) {
-      if (state.balance < price) {
-        showToast('Недостаточно средств на балансе');
-        activateTab(2, 'balance');
-        return;
-      }
-
-      state.balance -= price;
-      state.trialActive = false;
-      state.paidActive = true;
-      state.paidMonths = months;
-      state.accessCode = generateAccessCode();
-      state.expiryAt = Date.now() + months * 30 * 24 * 60 * 60 * 1000;
-      saveState();
-      render();
-      showToast('Тариф успешно активирован');
-      activateTab(0, 'home');
-    }
-
-    function topUp(amount) {
-      state.balance += amount;
-      saveState();
-      render();
-      showToast('Баланс пополнен на ' + amount + ' ₽');
-    }
-
-    function copyKey() {
-      if (!state.accessCode) {
-        showToast('Код доступа ещё не создан');
-        return;
-      }
-      navigator.clipboard.writeText(state.accessCode);
-      showToast('Код доступа скопирован');
-    }
-
-    function copyRef() {
-      navigator.clipboard.writeText(state.refCode);
-      showToast('Реферальная ссылка скопирована');
-    }
-
-    function contactSupport() {
-      window.open('https://t.me/velixfastbot', '_blank');
-    }
-
-    function showKeyInSupport() {
-      if (!state.accessCode) {
-        showToast('Активного кода пока нет');
-        return;
-      }
-      showToast('Код доступа: ' + state.accessCode);
-    }
-
-    function render() {
-      document.getElementById('helloName').textContent = 'Добро пожаловать, ' + state.userName + '!';
-      document.getElementById('balanceValue').textContent = formatBalance(state.balance);
-      document.getElementById('balancePageValue').textContent = formatBalance(state.balance);
-      document.getElementById('refCount').textContent = state.refs;
-      document.getElementById('refPageCount').textContent = state.refs;
-      document.getElementById('refBonusText').textContent = '+' + formatBalance(state.refBonus) + ' бонусов';
-      document.getElementById('refCodeBox').textContent = state.refCode;
-      updateHero();
-    }
-
-    applyTelegramUser();
-    render();
-    setInterval(render, 60000);
-  </script>
 </body>
 </html>
